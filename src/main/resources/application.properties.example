@@ -1,0 +1,12 @@
+spring.application.name=AlphaForge_demo1
+
+# 数据库连接配置（请复制此文件为 application.properties 并填入真实信息）
+spring.datasource.url=jdbc:mysql://localhost:3306/alphaforge?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=YOUR_PASSWORD_HERE
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA 配置
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+

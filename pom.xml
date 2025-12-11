@@ -12,6 +12,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+
     <groupId>com.ningshenquantlab</groupId>
     <artifactId>alphaForge_demo1</artifactId>
     <version>0.0.1-SNAPSHOT</version>

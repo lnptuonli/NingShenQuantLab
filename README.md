@@ -58,13 +58,13 @@ USE alphaforge;
 
 -- 创建用户表
 CREATE TABLE user (
-    id BIGINT PRIMARY KEY,
-    `key` VARCHAR(255),
-    username VARCHAR(255)
+cust_id BIGINT PRIMARY KEY,
+cust_key VARCHAR(255),
+cust_name VARCHAR(255)
 );
 
 -- 插入测试数据
-INSERT INTO user (id, `key`, username) VALUES 
+INSERT INTO user (cust_id, cust_key, cust_name) VALUES
 (100372, 'test-key-001', '张三'),
 (100373, 'test-key-002', '李四'),
 (100374, 'test-key-003', '王五');

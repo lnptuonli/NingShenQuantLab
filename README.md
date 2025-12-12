@@ -56,18 +56,20 @@ cd alphaForge_demo1
 CREATE DATABASE alphaforge CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE alphaforge;
 
--- 创建用户表
-CREATE TABLE user (
-cust_id BIGINT PRIMARY KEY,
-cust_key VARCHAR(255),
-cust_name VARCHAR(255)
-);
+-- 创建用户表（根据实际表结构）
+CREATE TABLE `user` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `cust_id` MEDIUMTEXT NULL DEFAULT NULL,
+    `cust_name` VARCHAR(50) NULL DEFAULT NULL,
+    `cust_key` VARCHAR(50) NULL DEFAULT NULL,
+    PRIMARY KEY (`id`) USING BTREE
+) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;
 
 -- 插入测试数据
 INSERT INTO user (cust_id, cust_key, cust_name) VALUES
-(100372, 'test-key-001', '张三'),
-(100373, 'test-key-002', '李四'),
-(100374, 'test-key-003', '王五');
+('100372', 'TestKey@123', '张三'),
+('100373', 'TestKey@456', '李四'),
+('100374', 'TestKey@789', '王五');
 ```
 
 #### 配置应用
@@ -105,27 +107,133 @@ mvnw.cmd spring-boot:run
 启动成功后，访问以下接口：
 
 - **Hello 接口**：http://localhost:8080/hello
-- **获取用户**：http://localhost:8080/user/100372
+- **获取用户列表**：http://localhost:8080/api/v1/users?page=1&size=10
+- **获取单个用户**：http://localhost:8080/api/v1/users/100372
+- **创建用户**：POST http://localhost:8080/api/v1/users
+- **更新用户**：PUT http://localhost:8080/api/v1/users/100372
+- **删除用户**：DELETE http://localhost:8080/api/v1/users/100372
 
 ## API 文档
 
-### 获取用户信息
+### 1. 查询用户列表（分页）
 
 **请求：**
 ```
-GET /user/{id}
+GET /api/v1/users?page=1&size=10&search=张三
 ```
 
 **参数：**
-- `id`：用户 ID（Long 类型）
+- `page`：页码（从 1 开始），默认 1
+- `size`：每页数量，默认 10
+- `search`：搜索关键词（可选）
 
 **响应示例：**
 ```json
 {
-  "id": 100372,
-  "key": "test-key-001",
-  "username": "张三"
+  "code": 200,
+  "message": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "custId": "100372",
+        "custName": "张三",
+        "custKey": "TestKey@123"
+      }
+    ],
+    "total": 1,
+    "page": 1,
+    "size": 10,
+    "totalPages": 1
+  },
+  "timestamp": 1234567890
 }
+```
+
+### 2. 获取单个用户
+
+**请求：**
+```
+GET /api/v1/users/{custId}
+```
+
+**参数：**
+- `custId`：客户 ID（String 类型）
+
+**响应示例：**
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 1,
+    "custId": "100372",
+    "custName": "张三",
+    "custKey": "TestKey@123"
+  },
+  "timestamp": 1234567890
+}
+```
+
+### 3. 创建用户
+
+**请求：**
+```
+POST /api/v1/users
+Content-Type: application/json
+
+{
+  "custId": "100375",
+  "custName": "李四",
+  "custKey": "Abc@1234"
+}
+```
+
+**校验规则：**
+- `custId`：必填，正数
+- `custName`：必填，2-50 字符
+- `custKey`：必填，8-50 字符，必须包含数字、字母和特殊符号
+
+**响应示例：**
+```json
+{
+  "code": 200,
+  "message": "创建成功",
+  "data": {
+    "id": 4,
+    "custId": "100375",
+    "custName": "李四",
+    "custKey": "Abc@1234"
+  },
+  "timestamp": 1234567890
+}
+```
+
+### 4. 更新用户
+
+**请求：**
+```
+PUT /api/v1/users/{custId}
+Content-Type: application/json
+
+{
+  "custName": "张三（修改）",
+  "custKey": "NewPass@123"
+}
+```
+
+### 5. 删除用户
+
+**请求：**
+```
+DELETE /api/v1/users/{custId}
+```
+
+### 6. 批量删除用户
+
+**请求：**
+```
+DELETE /api/v1/users?custIds=100372,100373,100374
 ```
 
 ## 注意事项
@@ -152,8 +260,22 @@ GET /user/{id}
 4. ✅ JdbcTemplate 数据库操作
 5. ✅ RESTful API 设计
 6. ✅ Lombok 简化代码
+7. ✅ 统一返回结果封装（Result）
+8. ✅ 参数校验（Bean Validation）
+9. ✅ 自定义校验注解
+10. ✅ 全局异常处理
+11. ✅ 声明式事务管理
+12. ✅ 分页查询
+13. ✅ 模糊搜索
+
+## 📚 详细文档
+
+- **CODE_REVIEW_AND_FIXES.md**：完整的代码审查报告和修复说明，包含所有知识点讲解
+- **GITHUB_SETUP.md**：GitHub 仓库设置和 Git 使用指南
+- **QUICK_START.md**：快速上传到 GitHub 的简明指南
 
 ## 许可证
 
 MIT License
+
 

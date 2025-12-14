@@ -57,6 +57,7 @@ public class UserDaoImpl implements UserDao {
      * - 如果查询不到数据，queryForObject 会抛出 EmptyResultDataAccessException
      * - 这里捕获后返回 null，由上层业务逻辑处理
      */
+    //这是springJDBC的风格，在Mybatis中，sql会直接写在xml里面
     @Override
     public User findById(String custId) {
         try {

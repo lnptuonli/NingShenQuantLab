@@ -87,7 +87,9 @@ public class UserController {
      */
     @GetMapping
     public Result<PageResult<User>> getUsers(
-            @RequestParam(defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer page,
+            //RequestParam的defaultValue属性自己是有默认值的，是一大串无意义的制表符和特殊字符，他认为用户不可能写得出这种字符串
+            //参数绑定时，优先取name="page"这个属性，如果没写，则会取参数名，即page、size、search
+            @RequestParam(name="page",defaultValue = "1") @Min(value = 1, message = "页码必须大于0") Integer page,
             @RequestParam(defaultValue = "10") @Min(value = 1, message = "每页数量必须大于0") Integer size,
             @RequestParam(required = false) String search
     ) {
@@ -97,7 +99,7 @@ public class UserController {
         List<User> users;
         Long total;
         
-        if (search != null && !search.trim().isEmpty()) {
+        if (search != null && !search.trim().isEmpty()) {//非空判断trim一下，万一全是空格呢
             // 有搜索关键词：模糊查询
             users = userService.search(search, page, size);
             total = userService.countBySearch(search);

@@ -62,6 +62,7 @@ public class Result<T> {
      * @param data 要返回的数据
      * @return Result 对象
      */
+    //public static <T>这样写，可以声明这个方法是一个泛型方法，在调用时，会根据上下文来推断出T的类型
     public static <T> Result<T> success(T data) {
         Result<T> result = new Result<>();
         result.setCode(200);

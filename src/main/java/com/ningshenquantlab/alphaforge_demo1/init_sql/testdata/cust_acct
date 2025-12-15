@@ -1,0 +1,4 @@
+INSERT INTO `user_acct` (`cust_id`,`cust_name`, `cust_key`, `cust_email`, `cust_phone`) VALUES
+('100372','admin', 'hjgfjhs**h29h&', 'admin@example.com', '13800138000'),
+('100373','zhangsan', 'uizhuhuhu*(&2b', 'zhangsan@example.com', '13800138001'),
+('100374','lisi', 'yuasgjysgyj&^%^%&*', 'lisi@example.com', '13800138002');

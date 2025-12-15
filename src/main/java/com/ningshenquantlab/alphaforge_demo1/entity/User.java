@@ -48,8 +48,8 @@ public class User {
      * 如果确定是数字，建议修改表结构为 BIGINT 或 VARCHAR
      */
     @NotNull(message = "客户ID不能为空", groups = UpdateGroup.class)
-    @Positive(message = "客户ID必须是正数")
-    private String custId;  // 根据表结构 MEDIUMTEXT，使用 String 类型
+    private Long custId;  // 根据表结构 BIGINT，使用 Long 类型，使用包装类是因为它可能为null
+    //JSON 序列化时，Long 可以序列化为 null，而万一数据库里是null，用基本类型long映射过来则永远是 0
 
     /**
      * 客户昵称/用户名

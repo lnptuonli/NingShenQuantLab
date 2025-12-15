@@ -90,11 +90,11 @@ cd alphaForge_demo1
 
 ```bash
 # 复制配置文件模板
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+cp src/main/resources/application.properties.old.example src/main/resources/application.properties.old
 
 # 编辑配置文件，修改数据库密码
-# Windows: notepad src/main/resources/application.properties
-# Linux/Mac: nano src/main/resources/application.properties
+# Windows: notepad src/main/resources/application.properties.old
+# Linux/Mac: nano src/main/resources/application.properties.old
 ```
 
 ### 3. 创建数据库

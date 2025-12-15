@@ -74,8 +74,8 @@ git clone https://github.com/YOUR_USERNAME/alphaForge_demo1.git
 cd alphaForge_demo1
 
 # 配置数据库
-cp src/main/resources/application.properties.example src/main/resources/application.properties
-# 编辑 application.properties，修改数据库密码
+cp src/main/resources/application.properties.old.example src/main/resources/application.properties.old
+# 编辑 application.properties.old，修改数据库密码
 
 # 运行
 mvnw.cmd spring-boot:run  # Windows

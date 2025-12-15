@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: AlphaForge_demo1
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/alphaforge?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 980713
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # HikariCP 连接池配置
+    hikari:
+      minimum-idle: 5              # 最小空闲连接数，池中始终保持的连接数
+      maximum-pool-size: 20        # 最大连接数，池中最多有多少连接
+      connection-timeout: 30000    # 连接超时时间（毫秒）
+      idle-timeout: 600000         # 空闲连接超时时间（毫秒）
+      max-lifetime: 1800000        # 连接最大存活时间（毫秒）
+  # MyBatis 配置
+  mybatis:
+    # Mapper XML 文件位置
+    mapper-locations: classpath:mapper/*.xml
+    # 实体类包路径（类型别名）
+    type-aliases-package: com.example.demo.entity
+    configuration:
+      # 下划线转驼峰，转换规则是：遇到下划线，去掉下划线并把后一个字母大写。
+      map-underscore-to-camel-case: true
+      # 打印 SQL（开发时开启，生产关闭）
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 现在使用MyBatis，jpa就不用了:
+  #   hibernate:
+  #     ddl-auto: update
+  #   show-sql: true

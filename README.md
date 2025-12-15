@@ -53,23 +53,25 @@ cd alphaForge_demo1
 #### 创建数据库
 
 ```sql
-CREATE DATABASE alphaforge CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE alphaforge;
-
--- 创建用户表（根据实际表结构）
-CREATE TABLE `user` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `cust_id` MEDIUMTEXT NULL DEFAULT NULL,
-    `cust_name` VARCHAR(50) NULL DEFAULT NULL,
-    `cust_key` VARCHAR(50) NULL DEFAULT NULL,
-    PRIMARY KEY (`id`) USING BTREE
-) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;
+CREATE TABLE `user_acct` (
+                        `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+                        `cust_id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+                        `cust_name` VARCHAR(50) NOT NULL COMMENT '用户名',
+                        `cust_key` VARCHAR(100) NOT NULL COMMENT '密码',
+                        `cust_email` VARCHAR(50) DEFAULT NULL COMMENT '邮箱',
+                        `cust_phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+                        `status` TINYINT(1) DEFAULT 1 COMMENT '状态（0-禁用 1-启用）',
+                        `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                        `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                        PRIMARY KEY (`cust_id`),
+                        UNIQUE KEY  (`cust_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号表';
 
 -- 插入测试数据
-INSERT INTO user (cust_id, cust_key, cust_name) VALUES
-('100372', 'TestKey@123', '张三'),
-('100373', 'TestKey@456', '李四'),
-('100374', 'TestKey@789', '王五');
+INSERT INTO `user_acct` (`cust_id`,`cust_name`, `cust_key`, `cust_email`, `cust_phone`) VALUES
+                                                                  ('100372','admin', 'hjgfjhs**h29h&', 'admin@example.com', '13800138000'),
+                                                                  ('100373','zhangsan', 'uizhuhuhu*(&2b', 'zhangsan@example.com', '13800138001'),
+                                                                  ('100374','lisi', 'yuasgjysgyj&^%^%&*', 'lisi@example.com', '13800138002');
 ```
 
 #### 配置应用
@@ -77,7 +79,7 @@ INSERT INTO user (cust_id, cust_key, cust_name) VALUES
 复制配置文件模板并修改数据库连接信息：
 
 ```bash
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+cp src/main/resources/application.properties.old.example src/main/resources/application.properties.old
 ```
 
 编辑 `application.properties`，修改数据库密码：
@@ -238,7 +240,7 @@ DELETE /api/v1/users?custIds=100372,100373,100374
 
 ## 注意事项
 
-⚠️ **重要：** 
+⚠️ **重要：**
 - `application.properties` 文件包含敏感信息（数据库密码），已被 `.gitignore` 忽略
 - 请使用 `application.properties.example` 作为模板创建自己的配置文件
 - 不要将包含真实密码的配置文件提交到 Git

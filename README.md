@@ -79,7 +79,7 @@ INSERT INTO `user_acct` (`cust_id`,`cust_name`, `cust_key`, `cust_email`, `cust_
 复制配置文件模板并修改数据库连接信息：
 
 ```bash
-cp src/main/resources/application.properties.old.example src/main/resources/application.properties.old
+cp src/main/resources/application.properties.old.old.example src/main/resources/application.properties.old.old
 ```
 
 编辑 `application.properties`，修改数据库密码：

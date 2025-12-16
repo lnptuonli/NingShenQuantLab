@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 必须对应 Mapper 接口的全限定名 -->
+<!-- mapper 根标签，`namespace` 必须对应 Mapper 接口 -->
+<mapper namespace="com.ningshenquantlab.alphaforge_demo1.mapper.UserAcctMapper">
+    <!-- 结果映射：定义如何将数据库字段映射到 Java 对象，好处是一次定义处处使用，只改一个字段的时候不用修改每个语句 -->
+    <!-- `property`：Java 对象的属性名 -->
+    <!-- `column`：数据库表的字段名 -->
+    <!-- 如果属性名和字段名一致（或驼峰转下划线一致），可以省略 -->
+    <resultMap id="BaseResultMap" type="UserAcct">
+        <id property="id" column="id"/>
+        <id property="custId" column="cust_id"/>
+        <result property="custName" column="cust_name"/>
+        <result property="custKey" column="cust_key"/>
+        <result property="custEmail" column="cust_email"/>
+        <result property="custPhone" column="cust_phone"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- SQL 片段：可复用的 SQL 片段，必须与数据库保持一致，因为最终会进到数据库执行 -->
+    <sql id="Base_Column_List">
+        id,cust_id ,cust_name, cust_key, cust_email, cust_phone, status, create_time, update_time
+    </sql>
+
+    <!-- 根据 ID 查询用户 -->
+    <select id="selectByCustId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_acct
+        WHERE cust_id = #{cust_id}
+    </select>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="selectByCustName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_acct
+        WHERE cust_name = #{cust_name}
+    </select>
+
+    <!-- 查询所有用户 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_acct
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 分页查询用户 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_acct
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询用户总数 -->
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM user_acct
+    </select>
+
+    <!-- 插入用户 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_acct (cust_name, cust_key, cust_email, cust_phone, status)
+        VALUES (#{cust_name}, #{cust_key}, #{cust_email}, #{cust_phone}, #{status})
+    </insert>
+
+    <!-- 更新用户 -->
+    <update id="update">
+        UPDATE user_acct
+        SET username = #{cust_name},
+            email = #{cust_email},
+            phone = #{cust_phone},
+            status = #{status}
+        WHERE cust_id = #{cust_id}
+    </update>
+
+    <!-- 删除用户 -->
+    <delete id="deleteByCustId">
+        DELETE FROM user_acct WHERE cust_id = #{cust_id}
+    </delete>
+
+</mapper>

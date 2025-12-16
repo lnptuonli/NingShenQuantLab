@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
      * @throws ResourceNotFoundException 用户不存在时抛出
      */
     @Override
-    public User findById(String custId) {
+    public User findById(Long custId) {
         log.debug("Service: 查询用户, custId={}", custId);
         
         // 调用 DAO 查询
@@ -205,7 +205,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteById(String custId) {
+    public void deleteById(Long custId) {
         log.info("Service: 删除用户, custId={}", custId);
         
         // 业务规则1：检查用户是否存在
@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public int batchDelete(List<String> custIds) {
+    public int batchDelete(List<Long> custIds) {
         log.info("Service: 批量删除用户, custIds={}", custIds);
         
         if (custIds == null || custIds.isEmpty()) {

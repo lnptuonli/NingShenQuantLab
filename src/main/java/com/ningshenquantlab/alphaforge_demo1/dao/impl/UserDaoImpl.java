@@ -59,7 +59,7 @@ public class UserDaoImpl implements UserDao {
      */
     //这是springJDBC的风格，在Mybatis中，sql会直接写在xml里面
     @Override
-    public User findById(String custId) {
+    public User findById(Long custId) {
         try {
             String sql = "SELECT * FROM user WHERE cust_id = ?";
             return jdbcTemplate.queryForObject(
@@ -188,7 +188,7 @@ public class UserDaoImpl implements UserDao {
      * - 根据 cust_id 删除记录
      */
     @Override
-    public int deleteById(String custId) {
+    public int deleteById(Long custId) {
         String sql = "DELETE FROM user WHERE cust_id = ?";
         return jdbcTemplate.update(sql, custId);
     }
@@ -206,7 +206,7 @@ public class UserDaoImpl implements UserDao {
      * 参数: [1, 2, 3]
      */
     @Override
-    public int batchDelete(List<String> custIds) {
+    public int batchDelete(List<Long> custIds) {
         if (custIds == null || custIds.isEmpty()) {
             return 0;  // 没有要删除的数据
         }
@@ -228,7 +228,7 @@ public class UserDaoImpl implements UserDao {
      * - 如果 count > 0，说明存在
      */
     @Override
-    public boolean existsById(String custId) {
+    public boolean existsById(Long custId) {
         String sql = "SELECT COUNT(*) FROM user WHERE cust_id = ?";
         Long count = jdbcTemplate.queryForObject(sql, Long.class, custId);
         return count != null && count > 0;

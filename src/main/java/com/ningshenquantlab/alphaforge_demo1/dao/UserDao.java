@@ -19,7 +19,7 @@ public interface UserDao {
      * @param custId 客户ID
      * @return 用户对象，如果不存在返回 null
      */
-    User findById(String custId);
+    User findById(Long custId);
     
     /**
      * 查询所有用户（分页）
@@ -70,19 +70,19 @@ public interface UserDao {
      * @param custId 客户ID
      * @return 受影响的行数
      */
-    int deleteById(String custId);
+    int deleteById(Long custId);
     
     /**
      * 批量删除用户
      * @param custIds 客户ID列表
      * @return 受影响的行数
      */
-    int batchDelete(List<String> custIds);
+    int batchDelete(List<Long> custIds);
     
     /**
      * 检查客户ID是否存在
      * @param custId 客户ID
      * @return true 存在，false 不存在
      */
-    boolean existsById(String custId);
+    boolean existsById(Long custId);
 }

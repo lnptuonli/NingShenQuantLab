@@ -25,7 +25,7 @@ public interface UserService {
      * @return 用户对象
      * @throws com.ningshenquantlab.alphaforge_demo1.exception.ResourceNotFoundException 用户不存在时抛出
      */
-    User findById(String custId);
+    User findById(Long custId);
     
     /**
      * 查询所有用户（分页）
@@ -78,12 +78,12 @@ public interface UserService {
      * @param custId 客户ID
      * @throws com.ningshenquantlab.alphaforge_demo1.exception.ResourceNotFoundException 用户不存在时抛出
      */
-    void deleteById(String custId);
+    void deleteById(Long custId);
     
     /**
      * 批量删除用户
      * @param custIds 客户ID列表
      * @return 实际删除的数量
      */
-    int batchDelete(List<String> custIds);
+    int batchDelete(List<Long> custIds);
 }

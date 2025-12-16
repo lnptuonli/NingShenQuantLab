@@ -138,7 +138,7 @@ public class UserController {
      */
     @GetMapping("/{custId}")
     public Result<User> getUser(
-            @PathVariable @NotNull(message = "客户ID不能为空") String custId
+            @PathVariable @NotNull(message = "客户ID不能为空") Long custId
     ) {
         log.info("Controller: 查询用户, custId={}", custId);
         
@@ -205,7 +205,7 @@ public class UserController {
      */
     @PutMapping("/{custId}")
     public Result<User> updateUser(
-            @PathVariable @NotNull(message = "客户ID不能为空") String custId,
+            @PathVariable @NotNull(message = "客户ID不能为空") Long custId,
             @RequestBody @Validated(UpdateGroup.class) User user
     ) {
         log.info("Controller: 更新用户, custId={}, user={}", custId, user);
@@ -231,7 +231,7 @@ public class UserController {
      */
     @DeleteMapping("/{custId}")
     public Result<Void> deleteUser(
-            @PathVariable @NotNull(message = "客户ID不能为空") String custId
+            @PathVariable @NotNull(message = "客户ID不能为空") Long custId
     ) {
         log.info("Controller: 删除用户, custId={}", custId);
         
@@ -255,7 +255,7 @@ public class UserController {
      */
     @DeleteMapping
     public Result<Void> batchDelete(
-            @RequestParam @NotNull(message = "客户ID列表不能为空") List<String> custIds
+            @RequestParam @NotNull(message = "客户ID列表不能为空") List<Long> custIds
     ) {
         log.info("Controller: 批量删除用户, custIds={}", custIds);
         

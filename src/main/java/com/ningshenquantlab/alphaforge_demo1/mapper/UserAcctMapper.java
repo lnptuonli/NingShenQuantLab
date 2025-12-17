@@ -50,6 +50,12 @@ public interface UserAcctMapper {
      * 删除用户
      */
     int deleteByCustId(Long custId);
+
+    List<UserAcct> search(String keyword, Integer page, Integer size);
+
+    Long countBySearch(String keyword);
+
+    int batchDelete(@Param("custIds") List<Long> custIds);
 }
 
 

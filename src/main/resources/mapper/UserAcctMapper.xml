@@ -26,20 +26,21 @@
         id,cust_id ,cust_name, cust_key, cust_email, cust_phone, status, create_time, update_time
     </sql>
 
-    <!-- 根据 ID 查询用户 -->
+    <!-- 根据 ID 查询用户 ,这里#{custId}不用驼峰也能跑，因为是单参数查询，但是非常不规范-->
     <select id="selectByCustId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM user_acct
-        WHERE cust_id = #{cust_id}
+        WHERE cust_id = #{custId}
     </select>
-
+    <!-- #{} 会使用预编译（推荐，防止 SQL 注入） 生成：WHERE id = ? -->
+    <!-- ${} 直接拼接（不安全，慎用） -->
     <!-- 根据用户名查询用户 -->
     <select id="selectByCustName" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM user_acct
-        WHERE cust_name = #{cust_name}
+        WHERE cust_name = #{custName}
     </select>
 
     <!-- 查询所有用户 -->
@@ -47,7 +48,7 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM user_acct
-        ORDER BY create_time DESC
+        ORDER BY cust_id DESC
     </select>
 
     <!-- 分页查询用户 -->
@@ -55,7 +56,7 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM user_acct
-        ORDER BY create_time DESC
+        ORDER BY cust_id DESC
         LIMIT #{offset}, #{limit}
     </select>
 
@@ -64,25 +65,49 @@
         SELECT COUNT(*) FROM user_acct
     </select>
 
-    <!-- 插入用户 -->
+    <!-- 模糊搜索用户 -->
+    <select id="search" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM user_acct
+        WHERE cust_name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY id DESC LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 模糊搜索用户-反显数量 -->
+    <select id="countBySearch" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user_acct WHERE cust_name LIKE CONCAT('%', #{keyword}, '%');
+    </select>
+
+    <!-- 插入用户，#{custId}注意一定是驼峰命名，否则Mybatis会去找 -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user_acct (cust_name, cust_key, cust_email, cust_phone, status)
-        VALUES (#{cust_name}, #{cust_key}, #{cust_email}, #{cust_phone}, #{status})
+        INSERT INTO user_acct (cust_id, cust_name, cust_key, cust_email, cust_phone, status)
+        VALUES (#{custId}, #{custName}, #{custKey}, #{custEmail}, #{custPhone}, #{status})
     </insert>
 
     <!-- 更新用户 -->
+    <!-- ！！！修复：属性名改为驼峰 -->
     <update id="update">
         UPDATE user_acct
-        SET username = #{cust_name},
-            email = #{cust_email},
-            phone = #{cust_phone},
+        SET cust_name = #{custName},
+            cust_email = #{custEmail},
+            cust_phone = #{custPhone},
             status = #{status}
-        WHERE cust_id = #{cust_id}
+        WHERE cust_id = #{custId}
     </update>
 
     <!-- 删除用户 -->
     <delete id="deleteByCustId">
         DELETE FROM user_acct WHERE cust_id = #{cust_id}
+    </delete>
+
+    <!-- 批量删除用户 -->
+    <delete id="batchDelete">
+        DELETE FROM user_acct
+        WHERE cust_id IN
+        <foreach collection="custIds" item="cust_id" open="(" separator="," close=")">
+            #{cust_id}
+        </foreach>
     </delete>
 
 </mapper>

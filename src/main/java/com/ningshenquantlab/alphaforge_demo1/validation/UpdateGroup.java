@@ -9,3 +9,4 @@ public interface UpdateGroup {
     // 空接口，仅用作分组标记
 }
 
+

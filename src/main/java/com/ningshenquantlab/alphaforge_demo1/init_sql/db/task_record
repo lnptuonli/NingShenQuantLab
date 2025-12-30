@@ -1,0 +1,20 @@
+CREATE TABLE `task_record` (
+                               `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+                               `task_name` VARCHAR(100) NOT NULL COMMENT '任务名称',
+                               `task_type` VARCHAR(50) NOT NULL COMMENT '任务类型（FEATURE_CALC/DATA_FETCH/MODEL_TRAIN）',
+                               `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '任务状态（PENDING/RUNNING/SUCCESS/FAILED/CANCELLED）',
+                               `command` TEXT NOT NULL COMMENT '执行的完整命令',
+                               `parameters` JSON COMMENT '任务参数（JSON格式）',
+                               `start_time` DATETIME COMMENT '开始时间',
+                               `end_time` DATETIME COMMENT '结束时间',
+                               `duration` INT COMMENT '执行时长（秒）',
+                               `exit_code` INT COMMENT '退出码',
+                               `error_message` TEXT COMMENT '错误信息',
+                               `created_by` VARCHAR(50) COMMENT '创建人',
+                               `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                               PRIMARY KEY (`id`),
+                               KEY `idx_status` (`status`),
+                               KEY `idx_task_type` (`task_type`),
+                               KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务记录表';

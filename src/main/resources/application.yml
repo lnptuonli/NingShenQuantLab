@@ -29,3 +29,40 @@ spring:
   #   hibernate:
   #     ddl-auto: update
   #   show-sql: true
+  # Python 执行配置
+  python:
+    # Python 解释器路径（支持虚拟环境）
+    interpreter: "C:/Users/NING/.conda/envs/quant_gpu/python.exe"  # Windows 示例
+    # interpreter: "/home/user/anaconda3/envs/quant/bin/python"  # Linux 示例
+
+    # 脚本根目录
+    script-path: "C:/Users/NING/PythonProject/Quantification-Researching-Platform/quantification_stock"
+
+    # 脚本配置
+    scripts:
+      feature-manager: "feature_manager.py"
+      data-fetcher: "main_data_acq_run_date_range.py"
+      model-trainer: ""
+
+    # 执行配置
+    execution:
+      timeout: 3600  # 超时时间（秒），默认1小时
+      max-concurrent-tasks: 5  # 最大并发任务数
+      enable-log-capture: true  # 是否捕获日志
+      log-buffer-size: 8192  # 日志缓冲区大小
+
+  # 异步任务配置
+  async:
+    executor:
+      core-pool-size: 5
+      max-pool-size: 10
+      queue-capacity: 100
+      thread-name-prefix: "quant-async-"
+
+  # 任务监控配置
+  task:
+    monitor:
+      enabled: true
+      check-interval: 5000  # 检查间隔（毫秒）
+      auto-retry: true  # 失败自动重试
+      max-retry-times: 3  # 最大重试次数

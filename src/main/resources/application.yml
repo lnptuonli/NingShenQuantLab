@@ -14,55 +14,49 @@ spring:
       connection-timeout: 30000    # 连接超时时间（毫秒）
       idle-timeout: 600000         # 空闲连接超时时间（毫秒）
       max-lifetime: 1800000        # 连接最大存活时间（毫秒）
-  # MyBatis 配置
-  mybatis:
-    # Mapper XML 文件位置
-    mapper-locations: classpath:mapper/*.xml
-    # 实体类包路径（类型别名）
-    type-aliases-package: com.example.demo.entity
-    configuration:
-      # 下划线转驼峰，转换规则是：遇到下划线，去掉下划线并把后一个字母大写。
-      map-underscore-to-camel-case: true
-      # 打印 SQL（开发时开启，生产关闭）
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  # 现在使用MyBatis，jpa就不用了:
-  #   hibernate:
-  #     ddl-auto: update
-  #   show-sql: true
-  # Python 执行配置
-  python:
-    # Python 解释器路径（支持虚拟环境）
-    interpreter: "C:/Users/NING/.conda/envs/quant_gpu/python.exe"  # Windows 示例
-    # interpreter: "/home/user/anaconda3/envs/quant/bin/python"  # Linux 示例
 
-    # 脚本根目录
-    script-path: "C:/Users/NING/PythonProject/Quantification-Researching-Platform/quantification_stock"
+# MyBatis 配置（顶级配置，不在 spring 下）
+mybatis:
+  # Mapper XML 文件位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类包路径（类型别名）
+  type-aliases-package: com.ningshenquantlab.alphaforge_demo1.customer.entity
+  configuration:
+    # 下划线转驼峰
+    map-underscore-to-camel-case: true
+    # 打印 SQL（开发时开启，生产关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-    # 脚本配置
-    scripts:
-      feature-manager: "feature_manager.py"
-      data-fetcher: "main_data_acq_run_date_range.py"
-      model-trainer: ""
+# Python 执行配置
+python:
+  # Python 解释器路径（支持虚拟环境）
+  interpreter: "C:/Users/NING/.conda/envs/quant_gpu/python.exe"
+  # 脚本根目录
+  script-path: "C:/Users/NING/PythonProject/Quantification-Researching-Platform/quantification_stock"
+  # 脚本配置
+  scripts:
+    feature-manager: "feature_manager.py"
+    data-fetcher: "main_data_acq_run_date_range.py"
+    model-trainer: ""
+  # 执行配置
+  execution:
+    timeout: 3600  # 超时时间（秒），默认1小时
+    max-concurrent-tasks: 5  # 最大并发任务数
+    enable-log-capture: true  # 是否捕获日志
+    log-buffer-size: 8192  # 日志缓冲区大小
 
-    # 执行配置
-    execution:
-      timeout: 3600  # 超时时间（秒），默认1小时
-      max-concurrent-tasks: 5  # 最大并发任务数
-      enable-log-capture: true  # 是否捕获日志
-      log-buffer-size: 8192  # 日志缓冲区大小
+# 异步任务配置
+async:
+  executor:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 100
+    thread-name-prefix: "quant-async-"
 
-  # 异步任务配置
-  async:
-    executor:
-      core-pool-size: 5
-      max-pool-size: 10
-      queue-capacity: 100
-      thread-name-prefix: "quant-async-"
-
-  # 任务监控配置
-  task:
-    monitor:
-      enabled: true
-      check-interval: 5000  # 检查间隔（毫秒）
-      auto-retry: true  # 失败自动重试
-      max-retry-times: 3  # 最大重试次数
+# 任务监控配置
+task:
+  monitor:
+    enabled: true
+    check-interval: 5000  # 检查间隔（毫秒）
+    auto-retry: true  # 失败自动重试
+    max-retry-times: 3  # 最大重试次数

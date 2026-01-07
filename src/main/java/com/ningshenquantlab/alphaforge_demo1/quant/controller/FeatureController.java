@@ -18,7 +18,8 @@ import java.util.List;
 @RequestMapping("/api/v1/features")
 public class FeatureController {
 
-    private final FeatureService featureService;
+/*    private final FeatureService featureService;*/
+
 
     /**
      * 计算特征
@@ -30,40 +31,41 @@ public class FeatureController {
      *   "async": true
      * }
      */
-    @PostMapping("/calculate")
+/*    @PostMapping("/calculate")
     public Result<TaskResponse> calculateFeatures(
             @RequestBody @Validated FeatureCalcRequest request) {
         TaskResponse task = featureService.calculateFeatures(request);
         return Result.success(task);
-    }
+    }*/
 
     /**
      * 查询任务状态
      * GET /api/v1/features/tasks/{taskId}
      */
-    @GetMapping("/tasks/{taskId}")
+/*    @GetMapping("/tasks/{taskId}")
     public Result<TaskResponse> getTaskStatus(@PathVariable Long taskId) {
         TaskResponse task = featureService.getTaskStatus(taskId);
         return Result.success(task);
-    }
+    }*/
 
     /**
      * 获取任务日志
      * GET /api/v1/features/tasks/{taskId}/logs
      */
-    @GetMapping("/tasks/{taskId}/logs")
+/*    @GetMapping("/tasks/{taskId}/logs")
     public Result<List<TaskLog>> getTaskLogs(@PathVariable Long taskId) {
         List<TaskLog> logs = featureService.getTaskLogs(taskId);
         return Result.success(logs);
-    }
+    }*/
 
     /**
      * 取消任务
      * POST /api/v1/features/tasks/{taskId}/cancel
      */
-    @PostMapping("/tasks/{taskId}/cancel")
+/*    @PostMapping("/tasks/{taskId}/cancel")
     public Result<Void> cancelTask(@PathVariable Long taskId) {
         featureService.cancelTask(taskId);
         return Result.success();
-    }
+    }*/
+
 }

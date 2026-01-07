@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @Configuration
-@EnableAsync  // 开启异步支持
+@EnableAsync(proxyTargetClass = true)  // 开启异步支持，强制使用 CGLIB 代理（解决 JDK 动态代理注入问题）
 public class AsyncConfig {
     
     /**

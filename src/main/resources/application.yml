@@ -1,3 +1,5 @@
+debug: true
+
 spring:
   application:
     name: AlphaForge_demo1

@@ -4,7 +4,7 @@
 
 <!-- namespace 必须对应 Mapper 接口的全限定名 -->
 <!-- mapper 根标签，`namespace` 必须对应 Mapper 接口 -->
-<mapper namespace="com.ningshenquantlab.alphaforge_demo1.mapper.UserAcctMapper">
+<mapper namespace="com.ningshenquantlab.alphaforge_demo1.customer.mapper.UserAcctMapper">
     <!-- 结果映射：定义如何将数据库字段映射到 Java 对象，好处是一次定义处处使用，只改一个字段的时候不用修改每个语句 -->
     <!-- `property`：Java 对象的属性名 -->
     <!-- `column`：数据库表的字段名 -->

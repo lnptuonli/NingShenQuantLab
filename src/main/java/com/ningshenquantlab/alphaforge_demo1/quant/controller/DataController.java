@@ -4,7 +4,7 @@ import com.ningshenquantlab.alphaforge_demo1.common.Result;
 import com.ningshenquantlab.alphaforge_demo1.quant.dto.DataFetchRequest;
 import com.ningshenquantlab.alphaforge_demo1.quant.dto.TaskResponse;
 import com.ningshenquantlab.alphaforge_demo1.quant.entity.TaskLog;
-import com.ningshenquantlab.alphaforge_demo1.quant.service.impl.DataServiceImpl;
+import com.ningshenquantlab.alphaforge_demo1.quant.service.DataService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ import java.util.List;
 public class DataController {
     
     @Autowired
-    private DataServiceImpl dataService;
+    private DataService dataService;
     
     /**
      * 提交数据获取任务

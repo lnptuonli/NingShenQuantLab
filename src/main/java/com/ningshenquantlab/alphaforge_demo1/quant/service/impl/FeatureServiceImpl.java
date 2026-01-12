@@ -8,32 +8,31 @@ import com.ningshenquantlab.alphaforge_demo1.executor.ExecutionResult;
 import com.ningshenquantlab.alphaforge_demo1.executor.LocalPythonExecutor;
 import com.ningshenquantlab.alphaforge_demo1.quant.dao.TaskLogDao;
 import com.ningshenquantlab.alphaforge_demo1.quant.dao.TaskRecordDao;
-import com.ningshenquantlab.alphaforge_demo1.quant.dto.DataFetchRequest;
+import com.ningshenquantlab.alphaforge_demo1.quant.dto.FeatureCalcRequest;
 import com.ningshenquantlab.alphaforge_demo1.quant.dto.TaskResponse;
 import com.ningshenquantlab.alphaforge_demo1.quant.entity.TaskLog;
 import com.ningshenquantlab.alphaforge_demo1.quant.entity.TaskRecord;
-import com.ningshenquantlab.alphaforge_demo1.quant.service.DataService;
+import com.ningshenquantlab.alphaforge_demo1.quant.service.FeatureService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 数据服务实现类
+ * 特征计算服务实现类
  * 
  * 职责：
- * 1. 接收数据获取请求，调用 Python 脚本
+ * 1. 接收特征计算请求，调用 Python 脚本
  * 2. 管理任务生命周期（创建、更新状态、记录日志）
  * 3. 提供任务查询、取消等功能
  */
 @Slf4j
 @Service
-public class DataServiceImpl implements DataService {
+public class FeatureServiceImpl implements FeatureService {
     
     @Autowired
     private LocalPythonExecutor pythonExecutor;
@@ -47,24 +46,27 @@ public class DataServiceImpl implements DataService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     
     /**
-     * 提交数据获取任务（异步执行）
+     * 提交特征计算任务（异步执行）
      * 
-     * @param request 数据获取请求
+     * @param request 特征计算请求
      * @return 任务ID
      */
+    @Override
     @Transactional
-    public Long submitDataFetchTask(DataFetchRequest request) {
-        log.info("提交数据获取任务：{}", request);
+    public Long submitFeatureCalcTask(FeatureCalcRequest request) {
+        log.info("提交特征计算任务：{}", request);
         
         // 1. 校验参数
-        if (!request.isValidDateRange()) {
-            throw new IllegalArgumentException("日期范围不合法：结束日期必须大于等于开始日期");
+        try {
+            request.validate();
+        } catch (IllegalArgumentException e) {
+            log.error("参数校验失败", e);
+            throw e;
         }
         
         // 2. 创建任务记录
-        // Lombok的链式构造器，每个方法返回的都是 builder 本身，反编译后是一个带有私有构造函数的、setter齐全的公共类
         TaskRecord taskRecord = TaskRecord.builder()
-                .taskType(TaskTypeEnum.DATA_FETCH.getCode())
+                .taskType(TaskTypeEnum.FEATURE_CALC.getCode())
                 .taskName(request.getEffectiveTaskName())
                 .status(TaskStatusEnum.PENDING.getCode())
                 .params(toJson(request))
@@ -75,14 +77,19 @@ public class DataServiceImpl implements DataService {
         taskRecordDao.insert(taskRecord);
         Long taskId = taskRecord.getId();
         
-        log.info("任务记录已创建，taskId={}", taskId);
+        log.info("特征计算任务记录已创建，taskId={}，计算范围：{}", 
+                taskId, request.getDateRangeDescription());
         
         // 3. 记录系统日志
-        saveTaskLog(taskId, "SYSTEM", "INFO", "任务已提交，等待执行");
+        String logMsg = String.format("任务已提交，等待执行。计算范围：%s，强制重算：%s", 
+                request.getDateRangeDescription(), request.getForce());
+        saveTaskLog(taskId, "SYSTEM", "INFO", logMsg);
         
         // 4. 异步执行 Python 脚本
-        String scriptName = TaskTypeEnum.DATA_FETCH.getScriptName();
-        List<String> args = Arrays.asList(request.toPythonArgs());
+        String scriptName = TaskTypeEnum.FEATURE_CALC.getScriptName();
+        List<String> args = request.toPythonArgs();
+        
+        log.info("开始执行特征计算脚本，scriptName={}，args={}", scriptName, args);
         
         CompletableFuture<ExecutionResult> future = pythonExecutor.executeAsync(scriptName, args);
         
@@ -90,7 +97,7 @@ public class DataServiceImpl implements DataService {
         future.thenAccept(result -> {
             updateTaskStatus(taskId, result);
         }).exceptionally(ex -> {
-            log.error("任务 {} 执行异常", taskId, ex);
+            log.error("特征计算任务 {} 执行异常", taskId, ex);
             updateTaskStatusOnError(taskId, ex);
             return null;
         });
@@ -104,26 +111,33 @@ public class DataServiceImpl implements DataService {
      * @param taskId 任务ID
      * @return 任务响应
      */
+    @Override
     public TaskResponse getTaskStatus(Long taskId) {
-        log.debug("查询任务状态，taskId={}", taskId);
+        log.debug("查询特征计算任务状态，taskId={}", taskId);
         
         TaskRecord taskRecord = taskRecordDao.selectById(taskId);
         if (taskRecord == null) {
             throw new IllegalArgumentException("任务不存在：" + taskId);
         }
         
+        // 只返回特征计算类型的任务
+        if (!TaskTypeEnum.FEATURE_CALC.getCode().equals(taskRecord.getTaskType())) {
+            throw new IllegalArgumentException("任务类型不匹配，期望：FEATURE_CALC，实际：" + taskRecord.getTaskType());
+        }
+        
         return TaskResponse.fromTaskRecord(taskRecord);
     }
     
     /**
-     * 查询所有任务
+     * 查询所有特征计算任务
      * 
      * @return 任务列表
      */
+    @Override
     public List<TaskResponse> getAllTasks() {
-        log.debug("查询所有任务");
+        log.debug("查询所有特征计算任务");
         
-        List<TaskRecord> records = taskRecordDao.selectAll();
+        List<TaskRecord> records = taskRecordDao.selectByTaskType(TaskTypeEnum.FEATURE_CALC.getCode());
         return records.stream()
                 .map(TaskResponse::fromTaskRecord)
                 .toList();
@@ -135,11 +149,15 @@ public class DataServiceImpl implements DataService {
      * @param status 任务状态
      * @return 任务列表
      */
+    @Override
     public List<TaskResponse> getTasksByStatus(String status) {
-        log.debug("查询任务，status={}", status);
+        log.debug("查询特征计算任务，status={}", status);
         
         List<TaskRecord> records = taskRecordDao.selectByStatus(status);
+        
+        // 只返回特征计算类型的任务
         return records.stream()
+                .filter(r -> TaskTypeEnum.FEATURE_CALC.getCode().equals(r.getTaskType()))
                 .map(TaskResponse::fromTaskRecord)
                 .toList();
     }
@@ -149,9 +167,10 @@ public class DataServiceImpl implements DataService {
      * 
      * @param taskId 任务ID
      */
+    @Override
     @Transactional
     public void cancelTask(Long taskId) {
-        log.info("取消任务，taskId={}", taskId);
+        log.info("取消特征计算任务，taskId={}", taskId);
         
         // 1. 查询任务记录
         TaskRecord taskRecord = taskRecordDao.selectById(taskId);
@@ -159,15 +178,20 @@ public class DataServiceImpl implements DataService {
             throw new IllegalArgumentException("任务不存在：" + taskId);
         }
         
-        // 2. 检查任务状态
+        // 2. 检查任务类型
+        if (!TaskTypeEnum.FEATURE_CALC.getCode().equals(taskRecord.getTaskType())) {
+            throw new IllegalArgumentException("任务类型不匹配，无法取消");
+        }
+        
+        // 3. 检查任务状态
         if (taskRecord.isTerminal()) {
             throw new IllegalStateException("任务已完成，无法取消");
         }
         
-        // 3. 调用执行器取消任务
+        // 4. 调用执行器取消任务
         pythonExecutor.cancelTask(taskId);
         
-        // 4. 更新任务状态
+        // 5. 更新任务状态
         taskRecord.setStatus(TaskStatusEnum.CANCELLED.getCode());
         taskRecord.setEndTime(LocalDateTime.now());
         taskRecord.setUpdateTime(LocalDateTime.now());
@@ -179,10 +203,10 @@ public class DataServiceImpl implements DataService {
         
         taskRecordDao.update(taskRecord);
         
-        // 5. 记录日志
+        // 6. 记录日志
         saveTaskLog(taskId, "SYSTEM", "INFO", "任务已被用户取消");
         
-        log.info("任务 {} 已取消", taskId);
+        log.info("特征计算任务 {} 已取消", taskId);
     }
     
     /**
@@ -191,8 +215,9 @@ public class DataServiceImpl implements DataService {
      * @param taskId 任务ID
      * @return 日志列表
      */
+    @Override
     public List<TaskLog> getTaskLogs(Long taskId) {
-        log.debug("查询任务日志，taskId={}", taskId);
+        log.debug("查询特征计算任务日志，taskId={}", taskId);
         return taskLogDao.selectByTaskId(taskId);
     }
     
@@ -202,7 +227,7 @@ public class DataServiceImpl implements DataService {
      * 更新任务状态（执行成功后）
      */
     private void updateTaskStatus(Long taskId, ExecutionResult result) {
-        log.info("更新任务状态，taskId={}，result={}", taskId, result);
+        log.info("更新特征计算任务状态，taskId={}，result={}", taskId, result);
         
         TaskRecord taskRecord = taskRecordDao.selectById(taskId);
         if (taskRecord == null) {
@@ -234,14 +259,14 @@ public class DataServiceImpl implements DataService {
             saveTaskLog(taskId, "PYTHON", "STDERR", result.getStderr());
         }
         
-        log.info("任务状态已更新，taskId={}，status={}", taskId, taskRecord.getStatus());
+        log.info("特征计算任务状态已更新，taskId={}，status={}", taskId, taskRecord.getStatus());
     }
     
     /**
      * 更新任务状态（执行异常时）
      */
     private void updateTaskStatusOnError(Long taskId, Throwable ex) {
-        log.error("任务执行异常，taskId={}", taskId, ex);
+        log.error("特征计算任务执行异常，taskId={}", taskId, ex);
         
         TaskRecord taskRecord = taskRecordDao.selectById(taskId);
         if (taskRecord == null) {
@@ -332,7 +357,7 @@ public class DataServiceImpl implements DataService {
      */
     private String extractResult(String stdout) {
         if (stdout == null || stdout.isEmpty()) {
-            return "执行成功";
+            return "特征计算完成";
         }
         
         // 简单提取最后几行作为结果
@@ -342,7 +367,7 @@ public class DataServiceImpl implements DataService {
             return lastLine.length() > 200 ? lastLine.substring(0, 200) + "..." : lastLine;
         }
         
-        return "执行成功";
+        return "特征计算完成";
     }
     
     /**
@@ -357,4 +382,3 @@ public class DataServiceImpl implements DataService {
         }
     }
 }
-

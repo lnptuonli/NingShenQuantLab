@@ -50,5 +50,17 @@ public interface TaskRecordDao {
      */
     @Select("SELECT * FROM task_record WHERE status = #{status} ORDER BY create_time DESC")
     List<TaskRecord> selectByStatus(String status);
+    
+    /**
+     * 根据任务类型查询任务记录
+     */
+    @Select("SELECT * FROM task_record WHERE task_type = #{taskType} ORDER BY create_time DESC LIMIT 100")
+    List<TaskRecord> selectByTaskType(String taskType);
+    
+    /**
+     * 根据任务类型和状态查询任务记录
+     */
+    @Select("SELECT * FROM task_record WHERE task_type = #{taskType} AND status = #{status} ORDER BY create_time DESC")
+    List<TaskRecord> selectByTaskTypeAndStatus(@Param("taskType") String taskType, @Param("status") String status);
 }
 
